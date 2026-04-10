@@ -1,5 +1,5 @@
 apiVersion: ai.sap.com/v1alpha1
-kind: WorkflowTemplate
+kind: ServingTemplate
 metadata:
   name: ml-training-model
   labels:
@@ -20,10 +20,10 @@ spec:
         labels:
           ai.sap.com/resourcePlan: train.l
       container:
-        image: docker.io/rahulcruze786/ml_training_model:0.0.1
+        image: docker.io/rahulcruze786/ml_training_model:0.0.2
         command: ["/bin/sh", "-c"]
         args:
-          - gunicorn --bind 0.0.0.0:5000 app:app
+          - gunicorn --bind 0.0.0.0:8080 app:app
         volumeMounts:
           - name: output
             mountPath: /app/models
