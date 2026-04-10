@@ -1,5 +1,5 @@
 apiVersion: ai.sap.com/v1alpha1
-kind: WorkFlowTemplate
+kind: ServingTemplate
 metadata:
   name: ml-training-model
   labels:
