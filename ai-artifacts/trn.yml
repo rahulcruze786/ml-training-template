@@ -1,17 +1,17 @@
 apiVersion: ai.sap.com/v1alpha1
 kind: ServingTemplate
 metadata:
-  name: ml-training-model
+  name: train-trans-model
   labels:
-    scenarios.ai.sap.com/id: "ml-classification-scenario"
-    executables.ai.sap.com/id: "ml-training"
+    scenarios.ai.sap.com/id: "train-trans-scenario"
+    executables.ai.sap.com/id: "train-trans-executable"
     ai.sap.com/version: "1.0.0"
   annotations:
-    executables.ai.sap.com/name: "ml-training-model"
+    executables.ai.sap.com/name: "train-trans-model"
 spec:
-  entrypoint: ml-training-model
+  entrypoint: train-trans-model
   templates:
-    - name: ml-training-model
+    - name: train-trans-model
       steps:
         - - name: training-step
             template: training-step
