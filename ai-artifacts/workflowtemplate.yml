@@ -1,28 +1,35 @@
 apiVersion: ai.sap.com/v1alpha1
-kind: ServingTemplate
+kind: WorkflowTemplate
 metadata:
   name: ml-training-model
   labels:
-    scenarios.ai.sap.com/id: "ml-training-scenario"
-    executables.ai.sap.com/id: "ml-training-workflow"
+    scenarios.ai.sap.com/id: "ml-classification-scenario"
+    executables.ai.sap.com/id: "ml-training"
     ai.sap.com/version: "1.0.0"
   annotations:
     executables.ai.sap.com/name: "ml-training-model"
 spec:
-  template:
-    apiVersion: serving.kserve.io/v1beta1
-    kind: InferenceService
-    metadata:
-      name: ml-training-model
-      annotations: |
-        autoscaling.knative.dev/metric: concurrency
-        autoscaling.knative.dev/target: "1"
-        autoscaling.knative.dev/targetBurstCapacity: "0"
-    spec: |
-      predictor:
-        containers:
-          - name: kserve-container
-            image: docker.io/rahulcruze786/ml_training_model:0.0.1
-            ports:
-              - containerPort: 8080
-                protocol: TCP
+  entrypoint: ml-training-model
+  templates:
+    - name: ml-training-model
+      steps:
+        - - name: training-step
+            template: training-step
+    - name: training-step
+      metadata:
+        labels:
+          ai.sap.com/resourcePlan: train.l
+      container:
+        image: docker.io/rahulcruze786/ml_training_model:0.0.1
+        command: ["/bin/sh", "-c"]
+        args:
+          - gunicorn --bind 0.0.0.0:5000 app:app
+        volumeMounts:
+          - name: output
+            mountPath: /app/models
+      outputs:
+        artifacts:
+          - name: trained-models
+            path: /app/models
+            archive:
+              none: {}
