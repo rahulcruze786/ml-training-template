@@ -10,8 +10,6 @@ metadata:
     executables.ai.sap.com/name: "ml-training-model"
 spec:
   entrypoint: ml-training-model
-  imagePullSecrets:
-    - name: YOUR_DOCKER_SECRET
   templates:
     - name: ml-training-model
       steps:
