@@ -3,7 +3,7 @@ kind: WorkflowTemplate
 metadata:
   name: ml-training-model
   labels:
-    scenarios.ai.sap.com/id: "ml-training-scenario"
+    scenarios.ai.sap.com/id: "ml-classification-scenario"
     executables.ai.sap.com/id: "ml-training"
     ai.sap.com/version: "1.0.0"
   annotations:
