@@ -1,35 +1,36 @@
 apiVersion: ai.sap.com/v1alpha1
 kind: ServingTemplate
 metadata:
-  name: train-trans-template
+  name: train-trans-api-template
+  annotations:
+    scenarios.ai.sap.com/description: "Transaction Analyzer API"
+    scenarios.ai.sap.com/name: "train-trans-scenario"
+    executables.ai.sap.com/description: "Transaction Analyzer API"
+    executables.ai.sap.com/name: "train-trans-executable"
   labels:
     scenarios.ai.sap.com/id: "train-trans-scenario"
-    executables.ai.sap.com/id: "train-trans-executable"
     ai.sap.com/version: "1.0.0"
-  annotations:
-    executables.ai.sap.com/name: "train-trans-template"
 spec:
-  entrypoint: train-trans-template
-  templates:
-    - name: train-trans-template
-      steps:
-        - - name: training-step
-            template: training-step
-    - name: training-step
-      metadata:
-        labels:
-          ai.sap.com/resourcePlan: train.l
-      container:
-        image: docker.io/rahulcruze786/ml_training_model:0.0.2
-        command: ["/bin/sh", "-c"]
-        args:
-          - gunicorn --bind 0.0.0.0:8080 app:app
-        volumeMounts:
-          - name: output
-            mountPath: /app/models
-      outputs:
-        artifacts:
-          - name: trained-models
-            path: /app/models
-            archive:
-              none: {}
+  inputs:
+    parameters: []
+  template:
+    apiVersion: "serving.kserve.io/v1beta1"
+    metadata:
+      annotations: "{}"
+      labels: "{\"ai.sap.com/resourcePlan\": \"starter\"}"
+    spec: |
+      predictor:
+        minReplicas: 1
+        maxReplicas: 2
+        containers:
+          - name: kserve-container
+            image: docker.io/rahulcruze786/ml_training_model:0.0.2
+            ports:
+              - containerPort: 8080
+                protocol: TCP
+            command: ["gunicorn"]
+            args:
+              - "--bind"
+              - "0.0.0.0:8080"
+              - "app:app"
+ 
