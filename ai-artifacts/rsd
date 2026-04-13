@@ -1,4 +1,4 @@
-CLIENT_ID="sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301"
+user: transaction-analyzer-tp $ CLIENT_ID="sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301"
 CLIENT_SECRET="56e3a705-fe31-4cd8-adab-b9b49790abbe$VkGaPU4HAATczI9yH00PmPRSFS4QU-dJCJw9XzuED8o="
 AUTH_URL="https://fin-analytical-svc-rnd.authentication.ap11.hana.ondemand.com"
 
@@ -10,9 +10,13 @@ TOKEN=$(curl -s -X POST "$AUTH_URL/oauth/token" \
 echo "Token obtained: $TOKEN"
 
 # Set deployment URL (replace with YOUR actual ID from AI Launchpad)
-DEPLOYMENT_URL="https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/<YOUR_PREDICTION_DEPLOYMENT_ID>"
+DEPLOYMENT_URL="https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/dafa5aa9a63e7d6c"
 
 # Now test health
 curl -s -X GET "$DEPLOYMENT_URL/v1/health" \
   -H "Authorization: Bearer $TOKEN" \
   -H "AI-Resource-Group: default" | python3 -m json.tool
+bash: !b37640: event not found
+Token obtained: 
+Expecting value: line 1 column 1 (char 0)
+user: transaction-analyzer-tp $ 
