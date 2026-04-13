@@ -1,4 +1,4 @@
-user: transaction-analyzer-tp $ python3 - <<'EOF'
+python3 - <<'EOF'
 import boto3, os
 
 s3 = boto3.client(
@@ -20,7 +20,16 @@ try:
             print(f"   {obj['Key']}  ({obj['Size']} bytes)")
     else:
         print("⚠️  ListObjects succeeded but 0 objects found at that prefix")
-EOF print(f"❌ Root list failed: {e}")", []): Delimiter="/", MaxKeys=20)
-❌ An error occurred (AccessDenied) when calling the ListObjectsV2 operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:ListBucket on resource: "arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f" with an explicit deny in an identity-based policy
-❌ Root list failed: An error occurred (AccessDenied) when calling the ListObjectsV2 operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:ListBucket on resource: "arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f" with an explicit deny in an identity-based policy
-user: transaction-analyzer-tp $ 
+        print("    → Models may be at a different path prefix")
+except Exception as e:
+    print(f"❌ {e}")
+
+# Also try listing root to find the actual path
+try:
+    resp2 = s3.list_objects_v2(Bucket=bucket, Delimiter="/", MaxKeys=20)
+    print("\nTop-level prefixes in bucket:")
+    for p in resp2.get("CommonPrefixes", []):
+        print(f"   {p['Prefix']}")
+except Exception as e:
+    print(f"❌ Root list failed: {e}")
+EOF
