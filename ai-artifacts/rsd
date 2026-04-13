@@ -1,38 +1,5 @@
-user: transaction-analyzer-tp $ /home/user/.asdf-inst/shims/python3.13 /home/user/projects/scripts/calling_prediction_api.py
-Getting token...
-Token retrieved ✅
-
-1. Calling Health API...
-Health Status Code : 200
-Health Response    : {"status":"healthyUI"}
-
-
-2. Reloading Models from S3...
-Reload Status Code : 500
-Reload Response    : {"message":"An error occurred (AccessDenied) when calling the GetObject operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:GetObject on resource: \"arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f/ai/transaction-analyzer/models/model_config.json\" with an explicit deny in an identity-based policy","status":"error"}
-
-
-3. Calling Process (Prediction) API...
-Process Status Code : 500
-Process Response   : {"message":"An error occurred (AccessDenied) when calling the GetObject operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:GetObject on resource: \"arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f/ai/transaction-analyzer/models/model_config.json\" with an explicit deny in an identity-based policy","status":"error","traceback":"Traceback (most recent call last):\n  File \"/app/app.py\", line 548, in process\n    result = process_data(config_params=config_params, market=market)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/app.py\", line 193, in process_data\n    models, metadata = get_models_and_metadata()\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/app.py\", line 109, in get_models_and_metadata\n    _metadata_cache = load_metadata_from_s3()\n                      ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/app.py\", line 70, in load_metadata_from_s3\n    response = s3.get_object(Bucket=bucket, Key=s3_key)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/botocore/client.py\", line 602, in _api_call\n    return self._make_api_call(operation_name, kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/botocore/context.py\", line 123, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/botocore/client.py\", line 1078, in _make_api_call\n    raise error_class(parsed_response, operation_name)\nbotocore.errorfactory.AccessDenied: An error occurred (AccessDenied) when calling the GetObject operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:GetObject on resource: \"arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f/ai/transaction-analyzer/models/model_config.json\" with an explicit deny in an identity-based policy\n"}
-
-
-4. Calling Get Config API...
-Config Status Code : 200
-Config rows returned: 15
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'TEXT_COL', 'Value': 'TEXT(S4Journal)'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'LABEL_COL', 'Value': 'taxcategory'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'CONSIDER_CLASS_TARGET_COL', 'Value': 'Deductible,Non-deductible'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_RL_FM_PROFIT_CENTRE', 'Value': '301537'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_RL_FM_OPER_UNIT', 'Value': '800'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_RL_FM_SEGMENT', 'Value': '4098'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_RL_FM_TEXT_CHATFIELD_COL', 'Value': 'lb,non-lb,goodwill,opt loss,cems,incident recovery,refund'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_OUTPUT_FM_TEXT_CHATFIELD_COL', 'Value': 'Non-deductible'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_RL_FM_TEXT_CHATFIELD_COL_CND_TH_AMT', 'Value': 'goodwill,cems,refund'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'OW_OUTPUT_FM_TEXT_CHATFIELD_COL_CND_TH_AMT', 'Value': 'Deductible'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'THRESHOLD_GROUPBY', 'Value': 'GLAccount,OperatingLocation,ProfitCenter,TEXT(S4Journal)'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'THRESHOLD_SUMBY', 'Value': 'Amount(Base)'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'THRESHOLD_AMOUNT', 'Value': '50000'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'NET_OFF_GROUPBY', 'Value': 'GLAccount,OperatingLocation,ProfitCenter,TEXT(S4Journal)'}
-  {'IMPORTED': None, 'Market': 'Hong Kong', 'Parameter': 'AMOUNT_COL', 'Value': 'Amount(Base)'}
-user: transaction-analyzer-tp $ 
+curl -s -X POST "https://<deployment-url>/v1/health" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "AI-Resource-Group: default" \
+  -H "Content-Type: application/json" \
+  -d '{}' | python3 -m json.tool
