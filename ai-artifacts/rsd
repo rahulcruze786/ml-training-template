@@ -1,5 +1,8 @@
-curl -s -X POST "https://<deployment-url>/v1/health" \
+TOKEN="<paste-your-actual-token-here>"
+DEPLOYMENT_URL="https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/<your-actual-deployment-id>"
+
+# Now test
+curl -s -X GET "$DEPLOYMENT_URL/v1/health" \
   -H "Authorization: Bearer $TOKEN" \
   -H "AI-Resource-Group: default" \
-  -H "Content-Type: application/json" \
-  -d '{}' | python3 -m json.tool
+  -H "Content-Type: application/json"
