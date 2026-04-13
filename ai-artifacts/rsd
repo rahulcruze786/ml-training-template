@@ -1,29 +1,25 @@
-CLIENT_ID='sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301'
+user: transaction-analyzer-tp $ CLIENT_ID='sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301'
 CLIENT_SECRET='56e3a705-fe31-4cd8-adab-b9b49790abbe$VkGaPU4HAATczI9yH00PmPRSFS4QU-dJCJw9XzuED8o='
 AUTH_URL='https://fin-analytical-svc-rnd.authentication.ap11.hana.ondemand.com'
 
 # Put your real prediction deployment ID here (no < >)
-DEPLOYMENT_URL='https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/REPLACE_WITH_REAL_ID'
-
-# Get token
-TOKEN=$(curl -s -X POST "$AUTH_URL/oauth/token" \
-  -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d "grant_type=client_credentials&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET" \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-
-echo "Token length: ${#TOKEN}"
-echo "Deployment URL: $DEPLOYMENT_URL"
-
-# Health
-curl -s -X GET "$DEPLOYMENT_URL/v1/health" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "AI-Resource-Group: default" \
-  -H "Accept: application/json" \
-  | python3 -m json.tool
-
+DEPLOYMENT_URL='https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/dafa5aa9a63e7d6c'
+Token length: 8370
+Deployment URL: https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/dafa5aa9a63e7d6c
+{OKEN=$(curl -s -X POST "$AUTH_URL/oauth/token" \
+    "status": "healthyUI"cation/x-www-form-urlencoded' \       
+} -d "grant_type=client_credentials&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET" \                                       
+{ | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")                             
+    "message": "An error occurred (AccessDenied) when calling the GetObject operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:GetObject on resource: \"arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f/ai/transaction-analyzer/models/model_config.json\" with an explicit deny in an identity-based policy",
+    "status": "error"                                                                 
+} Health                                                                              
+user: transaction-analyzer-tp $ 
+  -H "Authorization: Bearer $TOKEN" \                                          
+  -H "AI-Resource-Group: default" \                                          
+  -H "Accept: application/json" \                                          
+  | python3 -m json.tool                                          
+                                                                  
 # Reload models (main check)
 curl -s -X POST "$DEPLOYMENT_URL/v1/reload-models" \
   -H "Authorization: Bearer $TOKEN" \
   -H "AI-Resource-Group: default" \
-  -H "Content-Type: application/json" \
-  | python3 -m json.tool
