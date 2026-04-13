@@ -1,0 +1,79 @@
+import requests
+
+# ── Fill these from your AI Core Service Key ──────────────────
+CLIENT_ID       = "sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301"
+CLIENT_SECRET   = "56e3a705-fe31-4cd8-adab-b9b49790abbe$VkGaPU4HAATczI9yH00PmPRSFS4QU-dJCJw9XzuED8o="
+AUTH_URL        = "https://fin-analytical-svc-rnd.authentication.ap11.hana.ondemand.com"
+DEPLOYMENT_URL  = "https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/dbc59b7f62d8cfbd"   # ✅ new deployment URL
+RESOURCE_GROUP  = "default"
+# ─────────────────────────────────────────────────────────────
+
+# Step 1: Get Bearer Token
+def get_token():
+    response = requests.post(
+        url=f"{AUTH_URL}/oauth/token",
+        data={
+            "grant_type"   : "client_credentials",
+            "client_id"    : CLIENT_ID,
+            "client_secret": CLIENT_SECRET
+        }
+    )
+    response.raise_for_status()
+    return response.json()["access_token"]
+
+
+# Step 2: Call Health Endpoint
+def call_health(token):
+    headers = {
+        "Authorization"    : f"Bearer {token}",
+        "AI-Resource-Group": RESOURCE_GROUP,
+        "Content-Type"     : "application/json"
+    }
+    response = requests.get(
+        url=f"{DEPLOYMENT_URL}/v1/health",
+        headers=headers
+    )
+    print(f"Health Status Code : {response.status_code}")
+    print(f"Health Response    : {response.text}")
+    return response.json()
+
+
+# Step 3: Call Train Endpoint
+def call_train(token):
+    headers = {
+        "Authorization"    : f"Bearer {token}",
+        "AI-Resource-Group": RESOURCE_GROUP,
+        "Content-Type"     : "application/json"
+    }
+    body = {
+        "market"        : "Hong Kong",
+        "text_column"   : "TEXT(S4Journal)",
+        "target_column" : "taxcategory",
+        "allowed_class" : ["Deductible", "Non-deductible"],
+        "seasonal_words": "mbfc,cbp,rcls",
+        "process_types" : [
+            "Provisions and Payments of Operating Losses (B/S)",
+            "Provisions and Payments of Operating Losses (P/L)"
+        ]
+    }
+    response = requests.post(
+        url=f"{DEPLOYMENT_URL}/v1/train",
+        headers=headers,
+        json=body
+    )
+    print(f"Train Status Code : {response.status_code}")
+    print(f"Train Response    : {response.text}")
+    return response.json()
+
+
+# Main
+if __name__ == "__main__":
+    print("Getting token...")
+    token = get_token()
+    print("Token retrieved ✅")
+
+    print("\n1. Calling Health API...")
+    call_health(token)
+
+    print("\n2. Calling Train API...")
+    call_train(token)
