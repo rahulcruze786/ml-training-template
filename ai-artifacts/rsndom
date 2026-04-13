@@ -1,0 +1,53 @@
+python3 - <<'EOF'
+import boto3, json, tempfile, os, joblib
+
+bucket      = os.environ["S3_BUCKET"]
+endpoint    = os.environ["S3_ENDPOINT"]
+region      = os.environ["AWS_DEFAULT_REGION"]
+access_key  = os.environ["AWS_ACCESS_KEY_ID"]
+secret_key  = os.environ["AWS_SECRET_ACCESS_KEY"]
+path_prefix = os.environ.get("S3_PATH_PREFIX", "ai/transaction-analyzer")
+
+s3 = boto3.client(
+    's3',
+    region_name           = region,
+    aws_access_key_id     = access_key,
+    aws_secret_access_key = secret_key,
+    endpoint_url          = f"https://{endpoint}"
+)
+
+# --- Load metadata ---
+meta_key = f"{path_prefix}/models/model_config.json"
+print(f"\n📥 Loading metadata: s3://{bucket}/{meta_key}")
+response = s3.get_object(Bucket=bucket, Key=meta_key)
+metadata = json.loads(response['Body'].read().decode('utf-8'))
+models_info = metadata.get("models", {})
+print(f"✅ Metadata OK — {len(models_info)} models listed")
+print(f"   key_cols       : {metadata.get('key_cols')}")
+print(f"   text_column    : {metadata.get('text_column')}")
+print(f"   target_column  : {metadata.get('target_column')}")
+print(f"   market         : {metadata.get('market')}")
+
+# --- Download & load each model ---
+tmp_dir = tempfile.mkdtemp()
+ok, failed = 0, []
+
+for key, info in models_info.items():
+    model_file = info["model_file"]
+    s3_key     = f"{path_prefix}/models/{model_file}"
+    local_path = os.path.join(tmp_dir, model_file)
+    try:
+        s3.download_file(bucket, s3_key, local_path)
+        model = joblib.load(local_path)
+        steps = list(model.named_steps.keys())
+        print(f"  ✅ [{ok+1:02d}] {key}  →  pipeline steps: {steps}")
+        ok += 1
+    except Exception as e:
+        print(f"  ❌ {key}  →  {e}")
+        failed.append(key)
+
+print(f"\n{'='*60}")
+print(f"RESULT: {ok} loaded OK, {len(failed)} failed")
+if failed:
+    print(f"Failed keys: {failed}")
+EOF
