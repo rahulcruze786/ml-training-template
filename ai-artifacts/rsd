@@ -1,24 +1,35 @@
-user: transaction-analyzer-tp $ python3 - <<'EOF'
-import boto3, json, tempfile, os, joblib
+python3 - <<'EOF'
+import boto3, os
 
-bucket      = os.environ["S3_BUCKET"]
-endpoint    = os.environ["S3_ENDPOINT"]
-region      = os.environ["AWS_DEFAULT_REGION"]
-access_key  = os.environ["AWS_ACCESS_KEY_ID"]
-secret_key  = os.environ["AWS_SECRET_ACCESS_KEY"]
-path_prefix = os.environ.get("S3_PATH_PREFIX", "ai/transaction-analyzer")
+s3 = boto3.client(
+    's3',
+    region_name           = "ap-southeast-1",
+    aws_access_key_id     = "AKIAQAB2LD3UZJWKC65B",
+    aws_secret_access_key = "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",
+    endpoint_url          = "https://s3-ap-southeast-1.amazonaws.com"
+)
 
-EOF print(f"Failed keys: {failed}")n(failed)} failed")teps: {steps}")
+bucket = "hcp-44dcaebb-5af3-42b6-87b6-3731460a704f"
 
-📥 Loading metadata: s3://hcp-44dcaebb-5af3-42b6-87b6-3731460a704f/ai/transaction-analyzer/models/model_config.json
-Traceback (most recent call last):
-  File "<stdin>", line 21, in <module>
-  File "/home/user/.asdf-inst/installs/python/3.13.1/lib/python3.13/site-packages/botocore/client.py", line 602, in _api_call
-    return self._make_api_call(operation_name, kwargs)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/user/.asdf-inst/installs/python/3.13.1/lib/python3.13/site-packages/botocore/context.py", line 123, in wrapper
-    return func(*args, **kwargs)
-  File "/home/user/.asdf-inst/installs/python/3.13.1/lib/python3.13/site-packages/botocore/client.py", line 1078, in _make_api_call
-    raise error_class(parsed_response, operation_name)
-botocore.errorfactory.AccessDenied: An error occurred (AccessDenied) when calling the GetObject operation: User: arn:aws:iam::000122363625:user/hcp/s3/44dcaebb-5af3-42b6-87b6-3731460a704f/hcp-s3-394f1e23-8d5b-4eed-b092-6bcdf6632cf7 is not authorized to perform: s3:GetObject on resource: "arn:aws:s3:::hcp-44dcaebb-5af3-42b6-87b6-3731460a704f/ai/transaction-analyzer/models/model_config.json" with an explicit deny in an identity-based policy
-user: transaction-analyzer-tp $ 
+try:
+    resp = s3.list_objects_v2(Bucket=bucket, Prefix="ai/transaction-analyzer/models/", MaxKeys=20)
+    contents = resp.get("Contents", [])
+    if contents:
+        print(f"✅ Found {len(contents)} objects:")
+        for obj in contents:
+            print(f"   {obj['Key']}  ({obj['Size']} bytes)")
+    else:
+        print("⚠️  ListObjects succeeded but 0 objects found at that prefix")
+        print("    → Models may be at a different path prefix")
+except Exception as e:
+    print(f"❌ {e}")
+
+# Also try listing root to find the actual path
+try:
+    resp2 = s3.list_objects_v2(Bucket=bucket, Delimiter="/", MaxKeys=20)
+    print("\nTop-level prefixes in bucket:")
+    for p in resp2.get("CommonPrefixes", []):
+        print(f"   {p['Prefix']}")
+except Exception as e:
+    print(f"❌ Root list failed: {e}")
+EOF
