@@ -1,22 +1,29 @@
-user: transaction-analyzer-tp $ CLIENT_ID="sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301"
-CLIENT_SECRET="56e3a705-fe31-4cd8-adab-b9b49790abbe$VkGaPU4HAATczI9yH00PmPRSFS4QU-dJCJw9XzuED8o="
-AUTH_URL="https://fin-analytical-svc-rnd.authentication.ap11.hana.ondemand.com"
+CLIENT_ID='sb-524de71c-6fdc-42f9-9ca3-1aa049f9521f!b37640|xsuaa_std!b15301'
+CLIENT_SECRET='56e3a705-fe31-4cd8-adab-b9b49790abbe$VkGaPU4HAATczI9yH00PmPRSFS4QU-dJCJw9XzuED8o='
+AUTH_URL='https://fin-analytical-svc-rnd.authentication.ap11.hana.ondemand.com'
+
+# Put your real prediction deployment ID here (no < >)
+DEPLOYMENT_URL='https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/REPLACE_WITH_REAL_ID'
 
 # Get token
 TOKEN=$(curl -s -X POST "$AUTH_URL/oauth/token" \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
   -d "grant_type=client_credentials&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET" \
-  | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
 
-echo "Token obtained: $TOKEN"
+echo "Token length: ${#TOKEN}"
+echo "Deployment URL: $DEPLOYMENT_URL"
 
-# Set deployment URL (replace with YOUR actual ID from AI Launchpad)
-DEPLOYMENT_URL="https://api.ai.prod-ap11.ap-southeast-1.aws.ml.hana.ondemand.com/v2/inference/deployments/dafa5aa9a63e7d6c"
-
-# Now test health
+# Health
 curl -s -X GET "$DEPLOYMENT_URL/v1/health" \
   -H "Authorization: Bearer $TOKEN" \
-  -H "AI-Resource-Group: default" | python3 -m json.tool
-bash: !b37640: event not found
-Token obtained: 
-Expecting value: line 1 column 1 (char 0)
-user: transaction-analyzer-tp $ 
+  -H "AI-Resource-Group: default" \
+  -H "Accept: application/json" \
+  | python3 -m json.tool
+
+# Reload models (main check)
+curl -s -X POST "$DEPLOYMENT_URL/v1/reload-models" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "AI-Resource-Group: default" \
+  -H "Content-Type: application/json" \
+  | python3 -m json.tool
